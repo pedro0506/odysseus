@@ -5,25 +5,20 @@ services:
       - "${APP_BIND:-127.0.0.1}:${APP_PORT:-7000}:7000"
     volumes:
       - type: bind
-        source: ${APP_DATA_DIR:-./data}
+        source: ./data
         target: /app/data
-        is_directory: true
       - type: bind
-        source: ${APP_LOGS_DIR:-./logs}
+        source: ./logs
         target: /app/logs
-        is_directory: true
       - type: bind
-        source: ${APP_DATA_DIR:-./data}/ssh
+        source: ./data/ssh
         target: /app/.ssh
-        is_directory: true
       - type: bind
-        source: ${APP_DATA_DIR:-./data}/huggingface
+        source: ./data/huggingface
         target: /app/.cache/huggingface
-        is_directory: true
       - type: bind
-        source: ${APP_DATA_DIR:-./data}/local
+        source: ./data/local
         target: /app/.local
-        is_directory: true
     extra_hosts:
       # Lets the container reach local services on the Docker host, including
       # Ollama at http://host.docker.internal:11434.
