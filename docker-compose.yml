@@ -95,7 +95,7 @@ services:
     entrypoint:
       - /bin/sh
       - "-c"
-      - "set -eu\nif [ ! -s /etc/searxng/settings.yml ] || grep -q 'odysseus-local-searxng-json-2026-05-30\\|__SEARXNG_SECRET__' /etc/searxng/settings.yml; then\n  secret=\"$${SEARXNG_SECRET:-}\"\n  if [ -z \"$$secret\" ]; then\n    secret=\"$$(python -c 'import secrets; print(secrets.token_urlsafe(48))')\"\n  fi\n  sed \"s|__SEARXNG_SECRET__|$$secret|g\" /tmp/searxng-settings.yml.template > /etc/searxng/settings.yml\nfi\nexec /usr/local/searxng/entrypoint.sh\n"
+      - "set -eu\nif [ ! -s /etc/searxng/settings.yml ] || grep -q 'odysseus-local-searxng-json-2026-05-30\\|__SEARXNG_SECRET__' /etc/searxng/settings.yml; then\n  secret=\"$${SEARXNG_SECRET:-}\"\n  if [ -z \"$$secret\" ]; then\n    secret=\"$$(python3 -c 'import secrets; print(secrets.token_urlsafe(48))')\"\n  fi\n  sed \"s|__SEARXNG_SECRET__|$$secret|g\" /tmp/searxng-settings.yml.template > /etc/searxng/settings.yml\nfi\nexec /usr/local/searxng/entrypoint.sh\n"
     ports:
       - "${SEARXNG_BIND:-127.0.0.1}:${SEARXNG_PORT:-8080}:8080"
     volumes:
@@ -133,13 +133,11 @@ services:
       - SETUID
       - DAC_OVERRIDE
     healthcheck:
-      test:
-        - CMD-SHELL
-        - 'python -c "import urllib.request; urllib.request.urlopen(''http://localhost:8080/'', timeout=5).read(1)"'
-      interval: 5s
-      timeout: 6s
-      retries: 20
-      start_period: 10s
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/ > /dev/null"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
     restart: unless-stopped
 
   ntfy:
